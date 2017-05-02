@@ -1,70 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
 import MyBubbleFrame from './components/BubbleFrame';
-// Code goes here
-class DeckFrame extends React.Component{
-  render () {
-
-    var cards = this.props.cards;
-    var deck = [];
-    for (var i = 0; i <cards.length; i ++) {
-      deck.push(
-        <span className = "card" id = {cards[i]} > </span>
-      )
-    }
-
-    return (
-      <div id = "deck-frame">
-        <div className = "well">
-          {deck}
-        </div>
-      </div>
-    );
-  }
-};
-
-class HandFrame extends React.Component{
-  render () {
-    var hand = this.props.hand;
-    var cards = [];
-    for (var i = 0; i <hand.length; i ++) {
-      cards.push(
-        <span className = "card" id = {hand[i]}> </span>
-      )
-    }
-    return (
-
-      <div id = "hand-frame">
-        <div className = "well">
-          <h2> YOU </h2>
-          {cards}
-        </div>
-      </div>
-    );
-  }
-};
-
-class CpuFrame extends React.Component{
-  render () {
-    var cpu = this.props.cpu;
-    console.log(cpu);
-    var cards = [];
-    for (var i = 0; i <cpu.length; i ++) {
-      cards.push(
-        <span className = "card" id = "facedown"> </span>
-      )
-    }
-    return (
-
-      <div id = "cpu-frame">
-        <div className = "well">
-          <h2> CPU </h2>
-          {cards}
-        </div>
-      </div>
-    );
-  }
-};
+import HandFrame from './components/HandFrame';
+import CpuFrame from './components/CpuFrame';
+import ButtonFrame from './components/ButtonFrame';
+import DeckFrame from './components/DeckFrame';
 
 
 /*class RequestFrame extends React.Component {
@@ -83,23 +23,6 @@ class CpuFrame extends React.Component{
   }
 };*/
 
-class ButtonFrame extends React.Component {
-  render () {
-
-    var cards = this.props.cards;
-    var hand = this.props.hand;
-    var cpu = this.props.cpu;
-
-    return (
-      <div>
-        <button
-         onClick={this.props.shuffle.bind(null,cards)}> Shuffle </button>
-         <button onClick={this.props.drawCardHand.bind(null, cards, hand)} >Draw Card </button>
-         <button onClick={this.props.newGame} > New Game </button>
-      </div>
-    );
-  }
-};
 
 class CpuBubbleFrame extends React.Component {
   render () {
@@ -126,7 +49,7 @@ class Game extends React.Component{
       turn: 0,
       endOfTurn: false,
       compRequest: "",
-      request: ""
+      request: "",
     };
 
   }
@@ -192,8 +115,6 @@ class Game extends React.Component{
               cpu.splice(d, 1);
             }
 
-            console.log(hand);
-            console.log(cpu);
             this.checkArray(hand);
 
             if (cpu.length === 0) {
@@ -227,33 +148,38 @@ class Game extends React.Component{
 
   newGame() {
     //alert("Are you sure you want to start a new game?");
+    /*var newHand = [];
+    var newCpu = [];
+    var newCards = ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2",
+            "sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
+            "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
+            "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"];
+    var newTurn = 0;
+    var newEndOfTurn = false;
+    var newCompRequest = "";
+    var newRequest = ""; */
+
+
     this.setState (
       { cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2",
               "sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
               "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"],
-
+        cpu: [],
         hand: [],
         turn: 0,
         endOfTurn: false,
         compRequest: "",
-        request: ""}
+        request: ""},
+        function () {
+          return null;
+        }
     );
 
 
-    var cards = this.state.cards;
-    var hand = this.state.hand;
+    var cards=this.state.cards;
+    var hand=this.state.hand;
     var cpu = this.state.cpu;
-
-    console.log(cpu);
-    console.log(hand);
-    console.log(cards);
-
-    this.setState(prevState => { turn: prevState.turn + 1 });
-      this.setState(prevState => { cpu: prevState.cpu });
-
-
-    console.log(this.state.turn);
 
     this.shuffle(cards);
     for(var i = 0; i <5; i ++) {
@@ -264,9 +190,6 @@ class Game extends React.Component{
       this.drawCardCpu(cards,cpu);
     };
 
-    console.log(cpu);
-    console.log(hand);
-    console.log(cards.length);
   }
 
   drawCardCpu(cards, cpu) {
@@ -449,19 +372,19 @@ class Game extends React.Component{
         <h2>GoGoose</h2>
         <hr/>
         <div className="clearfix">
-          <CpuFrame cpu = {this.state.cpu}
-                    cards ={this.state.cards}/>
+          <CpuFrame cpu= {this.state.cpu}
+                    cards={this.state.cards}/>
           <CpuBubbleFrame />
-          <DeckFrame cards = {this.state.cards}/>
+          <DeckFrame cards= {this.state.cards}/>
           <ButtonFrame
-          cards = {this.state.cards}
-          shuffle = {this.shuffle.bind(this)}
-          drawCardHand = {this.drawCardHand.bind(this)}
-          hand = {this.state.hand}
-          newGame = {this.newGame.bind(this)}
-          cpu = {this.state.cpu}/>
-          <div id = "container2">
-            <HandFrame hand = {this.state.hand}/>
+          cards= {this.state.cards}
+          shuffle= {this.shuffle.bind(this)}
+          drawCardHand= {this.drawCardHand.bind(this)}
+          hand= {this.state.hand}
+          newGame= {this.newGame.bind(this)}
+          cpu= {this.state.cpu}/>
+          <div id="container2">
+            <HandFrame hand= {this.state.hand}/>
             <MyBubbleFrame />
           </div>
         </div>
