@@ -146,26 +146,28 @@ class Game extends React.Component{
     }
   }
 
-  componentWillReceiveProps() {
+  componentDidUpdate(nextProps) {
 
     console.log("game cards:", this.state.cards);
 
     if (this.props.newGame) {
-
-      this.shuffle(this.state.cards);
-
-      for(var i = 0; i <5; i ++) {
-          this.drawCardHand(this.state.cards, this.state.hand);
-      };
-
-        console.log("component did update");
-
-      for(var j = 0; j <5; j++) {
-        this.drawCardCpu(this.state.cards,this.state.cpu);
-
-      this.props.newGame = false;
-      };
+      this.deal(this.state.cards, this.state.cpu, this.state.hand);
     }
+  }
+
+  deal(cards, cpu, hand) {
+
+    this.shuffle(cards);
+
+    for(var i = 0; i <5; i ++) {
+        this.drawCardHand(cards, hand);
+    };
+
+    for(var j = 0; j <5; j++) {
+      this.drawCardCpu(cards, cpu);
+    };
+
+    this.props.newGame = false;
   }
 
   drawCardCpu(cards, cpu) {
@@ -383,7 +385,6 @@ class App extends React.Component {
       game: ()=><Game />,
       newGame: true
     });
-    console.log("newgame:", this.state.newGame);
   }
 
   render () {
