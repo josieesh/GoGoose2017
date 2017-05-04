@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import React, { Component } from 'react';
 import './App.css';
 import MyBubbleFrame from './components/BubbleFrame';
@@ -40,8 +41,7 @@ class Game extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2",
-              "sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
+      cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
               "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"],
       hand: [],
@@ -146,50 +146,26 @@ class Game extends React.Component{
     }
   }
 
-  newGame() {
-    //alert("Are you sure you want to start a new game?");
-    /*var newHand = [];
-    var newCpu = [];
-    var newCards = ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2",
-            "sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
-            "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
-            "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"];
-    var newTurn = 0;
-    var newEndOfTurn = false;
-    var newCompRequest = "";
-    var newRequest = ""; */
+  componentWillReceiveProps() {
 
+    console.log("game cards:", this.state.cards);
 
-    this.setState (
-      { cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2",
-              "sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
-              "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
-              "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"],
-        cpu: [],
-        hand: [],
-        turn: 0,
-        endOfTurn: false,
-        compRequest: "",
-        request: ""},
-        function () {
-          return null;
-        }
-    );
+    if (this.props.newGame) {
 
+      this.shuffle(this.state.cards);
 
-    var cards=this.state.cards;
-    var hand=this.state.hand;
-    var cpu = this.state.cpu;
+      for(var i = 0; i <5; i ++) {
+          this.drawCardHand(this.state.cards, this.state.hand);
+      };
 
-    this.shuffle(cards);
-    for(var i = 0; i <5; i ++) {
-      this.drawCardHand(cards, hand);
-    };
+        console.log("component did update");
 
-    for(var j = 0; j <5; j++) {
-      this.drawCardCpu(cards,cpu);
-    };
+      for(var j = 0; j <5; j++) {
+        this.drawCardCpu(this.state.cards,this.state.cpu);
 
+      this.props.newGame = false;
+      };
+    }
   }
 
   drawCardCpu(cards, cpu) {
@@ -221,9 +197,9 @@ class Game extends React.Component{
             cards: cards }
         );
     }
-    else {
+    /*else {
         alert('cannot draw card, deck is empty');
-    }
+    } */
   }
 
   /*countInArray: function(array, what) {
@@ -381,7 +357,6 @@ class Game extends React.Component{
           shuffle= {this.shuffle.bind(this)}
           drawCardHand= {this.drawCardHand.bind(this)}
           hand= {this.state.hand}
-          newGame= {this.newGame.bind(this)}
           cpu= {this.state.cpu}/>
           <div id="container2">
             <HandFrame hand= {this.state.hand}/>
@@ -393,4 +368,33 @@ class Game extends React.Component{
   }
 };
 
-export default Game;
+class App extends React.Component {
+    constructor(props) {
+    super(props);
+    this.newGame = this.newGame.bind(this);
+    this.state = {
+        game: ()=><Game />,
+        newGame: null
+    };
+  }
+
+  newGame () {
+    this.setState({
+      game: ()=><Game />,
+      newGame: true
+    });
+    console.log("newgame:", this.state.newGame);
+  }
+
+  render () {
+    const ActiveGame = this.state.game;
+    return (
+        <div>
+        <ActiveGame />
+        <button onClick={this.newGame} newGame={this.state.newGame}>New Game</button>
+      </div>
+    );
+  }
+}
+
+export default App;
