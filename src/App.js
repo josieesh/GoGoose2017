@@ -6,40 +6,16 @@ import HandFrame from './components/HandFrame';
 import CpuFrame from './components/CpuFrame';
 import ButtonFrame from './components/ButtonFrame';
 import DeckFrame from './components/DeckFrame';
+import CpuBubbleFrame from './components/CpuBubbleFrame';
+import RequestFrame from './components/RequestFrame';
 
-
-/*class RequestFrame extends React.Component {
-
-  render () {
-
-    return (
-      <div>
-        <form>
-          Request:
-          <input type="text">
-          <input type="submit" value="Submit">
-        </form>
-      </div>
-    );
-  }
-};*/
-
-
-class CpuBubbleFrame extends React.Component {
-  render () {
-
-    return (
-      <div id="cpuspeechbubble">
-        <textarea>Do you have a ...</textarea>
-      </div>
-    );
-  }
-};
 
 
 class Game extends React.Component{
   constructor(props) {
     super(props);
+    this.myTurn.bind(this);
+    this.deal.bind(this);
     this.state = {
       cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
@@ -48,7 +24,7 @@ class Game extends React.Component{
       cpu: [],
       turn: 0,
       endOfTurn: false,
-      compRequest: "",
+      cpuRequest: "",
       request: "",
     };
 
@@ -81,7 +57,7 @@ class Game extends React.Component{
     var hand = this.state.hand;
     var cpu = this.state.cpu;
     var endOfTurn = this.state.endOfTurn;
-    var turn = this.state.turn
+    var turn = this.state.turn;
 
     endOfTurn = false;
 
@@ -352,7 +328,7 @@ class Game extends React.Component{
         <div className="clearfix">
           <CpuFrame cpu= {this.state.cpu}
                     cards={this.state.cards}/>
-          <CpuBubbleFrame />
+          <CpuBubbleFrame request={this.state.cpuRequest}/>
           <DeckFrame cards= {this.state.cards}/>
           <ButtonFrame
           cards= {this.state.cards}
@@ -363,6 +339,7 @@ class Game extends React.Component{
           <div id="container2">
             <HandFrame hand= {this.state.hand}/>
             <MyBubbleFrame />
+            <RequestFrame request = {this.state.request} turn = {this.state.turn}/>
           </div>
         </div>
       </div>

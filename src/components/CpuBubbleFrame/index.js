@@ -1,15 +1,14 @@
 import React, {Component} from 'react';
 
-
-class MyBubbleFrame extends React.Component {
+class CpuBubbleFrame extends React.Component {
   render () {
 
     return (
-      <div id="myspeechbubble">
+      <div id="cpuspeechbubble">
         <p>Do you have a ...</p>
       </div>
     );
   }
 };
 
-export default MyBubbleFrame;
+export default CpuBubbleFrame;
