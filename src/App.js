@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './App.css';
 import MyBubbleFrame from './components/BubbleFrame';
 import HandFrame from './components/HandFrame';
@@ -22,12 +23,21 @@ class Game extends React.Component{
               "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"],
       hand: [],
       cpu: [],
-      turn: 0,
+      turn: 1,
       endOfTurn: false,
       cpuRequest: "",
       request: "",
     };
 
+    this.deal(this.state.cards, this.state.cpu, this.state.hand);
+  }
+
+  componentDidMount() {
+
+    this.setState ({
+      cpuRequest: this.cpuRequest(),
+      }
+    );
   }
 
 
@@ -49,6 +59,10 @@ class Game extends React.Component{
         }
     }
   }, */
+
+  cpuTurn() {
+
+  }
 
   myTurn() {
 
@@ -122,15 +136,6 @@ class Game extends React.Component{
     }
   }
 
-  componentDidUpdate(nextProps) {
-
-    console.log("game cards:", this.state.cards);
-
-    if (this.props.newGame) {
-      this.deal(this.state.cards, this.state.cpu, this.state.hand);
-    }
-  }
-
   deal(cards, cpu, hand) {
 
     this.shuffle(cards);
@@ -143,7 +148,6 @@ class Game extends React.Component{
       this.drawCardCpu(cards, cpu);
     };
 
-    this.props.newGame = false;
   }
 
   drawCardCpu(cards, cpu) {
@@ -244,69 +248,81 @@ class Game extends React.Component{
         array.splice(0,4);
     }
 
-  },
+  }*/
 
-  computerRequest: function() {
+  cpuRequest() {
 
-    var chosenAskingCard = chooseAskingCard(this.state.cpu);
+    var request = "";
+    var chosenAskingCard = this.chooseAskingCard(this.state.cpu);
 
     if (chosenAskingCard==='c2' || chosenAskingCard === 'd2' || chosenAskingCard==='s2' || chosenAskingCard === 'h2')
     {
-        console.log("Do you have a 2?");
+        request = "Do you have a 2?";
     }
     else if (chosenAskingCard==='c3' || chosenAskingCard === 'd3' || chosenAskingCard=== 's3' || chosenAskingCard === 'h3')
     {
-        console.log("Do you have a 3?");
+        request = "Do you have a 3?";
     }
     else if (chosenAskingCard=== 'c4' || chosenAskingCard === 'd4' || chosenAskingCard=== 's4' || chosenAskingCard === 'h4')
     {
-        console.log("Do you have a 4?");
+        request = "Do you have a 4?";
     }
     else if (chosenAskingCard=== 'c5' || chosenAskingCard === 'd5' || chosenAskingCard=== 's5' || chosenAskingCard === 'h5')
     {
-        console.log("Do you have a 5?");
+        request = "Do you have a 5?";
     }
     else if (chosenAskingCard=== 'c6' || chosenAskingCard === 'd6' || chosenAskingCard=== 's6' || chosenAskingCard === 'h6')
     {
-        console.log("Do you have a 6?");
+        request = "Do you have a 6?";
     }
     else if (chosenAskingCard=== 'c7' || chosenAskingCard=== 'd7' || chosenAskingCard=== 's7' || chosenAskingCard === 'h7')
     {
-        console.log("Do you have a 7?");
+        request = "Do you have a 7?";
     }
     else if (chosenAskingCard=== 'c8' || chosenAskingCard=== 'd8' || chosenAskingCard=== 's8' || chosenAskingCard=== 'h8')
     {
-        console.log("Do you have an 8?");
+        request="Do you have an 8?";
     }
     else if (chosenAskingCard=== 'c9' || chosenAskingCard === 'd9' || chosenAskingCard=== 's9' || chosenAskingCard=== 'h9')
     {
-        console.log("Do you have a 9?");
+        request="Do you have a 9?";
     }
     else if (chosenAskingCard=== 'c10' || chosenAskingCard=== 'd10' || chosenAskingCard=== 's10' || chosenAskingCard=== 'h10')
     {
-        console.log("Do you have a 10?");
+        request="Do you have a 10?";
     }
     else if (chosenAskingCard==='cj' || chosenAskingCard=== 'dj' || chosenAskingCard=== 'sj' || chosenAskingCard=== 'hj')
     {
-        console.log("Do you have a Jack?");
+        request="Do you have a Jack?";
     }
     else if (chosenAskingCard=== 'cq'|| chosenAskingCard=== 'dq' || chosenAskingCard=== 'sq' || chosenAskingCard=== 'hq')
     {
-        console.log("Do you have a Queen?");
+        request="Do you have a Queen?";
     }
     else if (chosenAskingCard=== 'ck' || chosenAskingCard=== 'dk' || chosenAskingCard=== 'sk' || chosenAskingCard === 'hk')
     {
-        console.log("Do you have a King?");
+        request="Do you have a King?";
     }
     else {
-        console.log("Do you have an Ace?");
+        request="Do you have an Ace?";
     }
-  },
 
-  chooseAskingCard: function(cpu) {
+    return request;
+  }
+
+  chooseAskingCard(cpu) {
     var value = Math.floor(Math.random() * cpu.length);
+    console.log("in function chooseAskingCard, value is:", cpu[value]);
     return cpu[value];
-  },*/
+  }
+
+  check(x, request) {
+    for (var i = 0; i < x.length; i++) {
+      if (x[i] == "c" + request || x[i] == "s" + request || x[i] == "h" + request || x[i] == "d" + request) {
+          return true;
+      }
+    }
+  }
 
   shuffle(cards) {
     var j, x, i;
@@ -321,6 +337,7 @@ class Game extends React.Component{
   }
 
   render(){
+
     return(
       <div id="game">
         <h2>GoGoose</h2>
@@ -328,7 +345,7 @@ class Game extends React.Component{
         <div className="clearfix">
           <CpuFrame cpu= {this.state.cpu}
                     cards={this.state.cards}/>
-          <CpuBubbleFrame request={this.state.cpuRequest}/>
+          <CpuBubbleFrame request={this.state.cpuRequest} turn={this.state.turn}/>
           <DeckFrame cards= {this.state.cards}/>
           <ButtonFrame
           cards= {this.state.cards}
@@ -338,7 +355,7 @@ class Game extends React.Component{
           cpu= {this.state.cpu}/>
           <div id="container2">
             <HandFrame hand= {this.state.hand}/>
-            <MyBubbleFrame />
+            <MyBubbleFrame turn ={this.state.turn}/>
             <RequestFrame request = {this.state.request} turn = {this.state.turn}/>
           </div>
         </div>
@@ -353,14 +370,12 @@ class App extends React.Component {
     this.newGame = this.newGame.bind(this);
     this.state = {
         game: ()=><Game />,
-        newGame: null
     };
   }
 
   newGame () {
     this.setState({
       game: ()=><Game />,
-      newGame: true
     });
   }
 
@@ -369,7 +384,7 @@ class App extends React.Component {
     return (
         <div>
         <ActiveGame />
-        <button onClick={this.newGame} newGame={this.state.newGame}>New Game</button>
+        <button onClick={this.newGame} >New Game</button>
       </div>
     );
   }

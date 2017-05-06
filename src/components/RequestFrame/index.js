@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {Form, Field} from 'simple-react-forms';
 
 class RequestFrame extends React.Component {
@@ -16,7 +17,7 @@ class RequestFrame extends React.Component {
             type='text'
           />
       </Form>
-      <button onClick={this.onClickHandler.bind(this)} disabled={!(this.props.turn)%2 == 0}>Submit</button>
+      <button onClick={this.onClickHandler.bind(this)} disabled={!(this.props.turn)%2 === 0}>Submit</button>
     </div>
 
     );

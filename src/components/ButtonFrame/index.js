@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
 class ButtonFrame extends React.Component {
   render () {
 
     var cards = this.props.cards;
     console.log("button frame cards:", cards);
-    
+
     var hand = this.props.hand;
     var cpu = this.props.cpu;
 

@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
+import React from 'react';
 
 class HandFrame extends React.Component{
-  constructor(props) {
+  /*constructor(props) {
     super(props)
-  }
+  }*/
+
   render () {
     var hand = this.props.hand;
     var cards = [];

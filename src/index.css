@@ -6,6 +6,10 @@ body {
 
 /* Styles go here */
 
+.hidden {
+  display:none;
+}
+
 #deck-frame {
   width: 100%;
 }

@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 
 class CpuFrame extends React.Component{
-  constructor(props) {
+  /*constructor(props) {
     super(props)
-  }
+  } */
 
   render () {
     var cpu = this.props.cpu;
