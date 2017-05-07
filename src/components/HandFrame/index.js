@@ -3,15 +3,29 @@ import React from 'react';
 class HandFrame extends React.Component{
   /*constructor(props) {
     super(props)
+  } */
+
+  /*handleClick (arr, obj) {
+    if (this.disabled(arr,obj)) {
+      alert("cannot click this card");
+    }
+    else{
+      this.props.sendCardToCpu;
+    }
+  }
+
+  disabled(arr,obj) {
+    return (arr.indexOf(obj) != -1);
   }*/
 
   render () {
     var hand = this.props.hand;
     var cards = [];
+    var disabledCards = this.props.disabledCards;
 
     for (var i = 0; i <hand.length; i ++) {
       cards.push(
-        <span key={i} className = "card" id = {hand[i]}> </span>
+        <span key={i} className="card" id={hand[i]} onClick={this.props.sendCardToCpu.bind(null, hand[i])}> </span>
       )
     }
     return (

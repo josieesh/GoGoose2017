@@ -43,25 +43,6 @@ class Game extends React.Component{
     this.cpuTurn();
   }
 
-  playerResponse (hand, cpuChosenAskingCard, request) {
-    var disabledCards = [];
-    if (this.check(hand, cpuChosenAskingCard)) {
-      for (var i = 0; i < hand.length; i++) {
-        if (hand[i][1] !== cpuChosenAskingCard[1]) {
-          disabledCards.push(hand[i]);
-        }
-      }
-    }
-    else {
-      console.log("click the gofish button");
-      disabledCards = hand;
-    }
-
-    this.setState ({
-      disabledCards: disabledCards,
-    })
-  }
-
   /* game () {
     if (this.state.turn%2 === 0){
       console.log("my turn");
@@ -74,6 +55,8 @@ class Game extends React.Component{
   }*/
 
   cpuTurn() {
+
+    console.log("calling cpuTurn");
 
     var cards = this.state.cards;
     var request = this.state.request;
@@ -96,7 +79,32 @@ class Game extends React.Component{
     });
   }
 
+  playerResponse (hand, cpuChosenAskingCard, request) {
+    var disabledCards = [];
+    if (this.check(hand, cpuChosenAskingCard)) {
+      for (var i = 0; i < hand.length; i++) {
+        if (hand[i][1] !== cpuChosenAskingCard[1]) {
+          disabledCards.push(hand[i]);
+        }
+      }
+    }
+    else {
+      console.log("click the gofish button");
+      disabledCards = hand;
+    }
+
+    this.setState ({
+      disabledCards: disabledCards,
+    })
+    console.log("disabled cards:", disabledCards);
+  }
+
   myTurn() {
+
+    this.setState({
+      cpuRequest: "",
+      cpuChosenAskingCard: "",
+    });
 
     var cards = this.state.cards;
     var request = this.state.request;
@@ -375,9 +383,40 @@ class Game extends React.Component{
   }
 
   goGoose() {
-      this.setState({ request: "Go Goose!"})
+      this.setState({ request: "Go Goose!"});
+      this.drawCardCpu(this.state.cards, this.state.cpu);
+      if(this.state.cpu === this.state.cpuChosenAskingCard) {
+        this.cpuTurn();
+      }
+      else {
+        this.myTurn();
+      }
   }
 
+  sendCardToCpu(card) {
+    var hand = this.state.hand;
+    var cpu = this.state.cpu;
+    var disabledCards = this.state.disabledCards;
+
+    if (disabledCards.indexOf(card) != -1) {
+      alert("cannot click this card");
+
+    }
+    else {
+      hand.splice(hand.indexOf(card),1);
+      cpu.push(card);
+      this.setState({
+        hand: hand,
+        cpu: cpu,
+        cpuRequest: "",
+        cpuChosenAskingCard: "",
+      });
+
+      if (disabledCards.length === hand.length) { //this checks to see if there are any other cards to be sent to cpu before calling cpuTurn again
+        this.cpuTurn();
+      }
+    }
+  }
   render(){
 
     return(
@@ -398,7 +437,7 @@ class Game extends React.Component{
           disabledCards={this.state.disabledCards}
           goGoose={this.goGoose}/>
           <div id="container2">
-            <HandFrame hand= {this.state.hand}/>
+            <HandFrame disabledCards={this.state.disabledCards} hand= {this.state.hand} sendCardToCpu={this.sendCardToCpu.bind(this)}/>
             <MyBubbleFrame request = {this.state.request}/>
             <RequestFrame onUpdate={this.onUpdate.bind(this)} request = {this.state.request} turn = {this.state.turn}/>
           </div>

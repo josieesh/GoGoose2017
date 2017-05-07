@@ -13,11 +13,20 @@ class MyBubbleFrame extends React.Component {
       className = "hidden";
     }
 
-    return (
-      <div className ={className} id="myspeechbubble">
-        <p>Do you have {this.props.request}?</p>
-      </div>
-    );
+    if (this.props.request==="Go Goose!") {
+      return (
+        <div className={className} id='myspeechbubble'>
+          <p>{this.props.request}</p>
+        </div>
+      )
+    }
+    else {
+      return (
+        <div className ={className} id="myspeechbubble">
+          <p>Do you have {this.props.request}?</p>
+        </div>
+      );
+    }
   }
 };
 

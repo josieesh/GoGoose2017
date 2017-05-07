@@ -1,7 +1,5 @@
-import React, {Component} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import {Form, Field} from 'simple-react-forms';
 
 class RequestFrame extends React.Component {
 

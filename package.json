@@ -9,6 +9,7 @@
     "simple-react-forms": "^1.3.0"
   },
   "devDependencies": {
+    "babel-plugin-transform-react-jsx": "^6.24.1",
     "react-scripts": "0.9.5"
   },
   "scripts": {

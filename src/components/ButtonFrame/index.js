@@ -23,8 +23,7 @@ class ButtonFrame extends React.Component {
 
     return (
       <div>
-        <button
-         onClick={this.props.shuffle.bind(null,cards)}> Shuffle </button>
+        <button onClick={this.props.shuffle.bind(null,cards)}> Shuffle </button>
          <button onClick={this.props.drawCardHand.bind(null, cards, hand)} >Draw Card </button>
          <button onClick={this.props.goGoose} disabled={this.found()}>Go Goose!</button>
       </div>
