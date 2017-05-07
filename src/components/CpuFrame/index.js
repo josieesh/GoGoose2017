@@ -7,7 +7,7 @@ class CpuFrame extends React.Component{
 
   render () {
     var cpu = this.props.cpu;
-    console.log(cpu);
+    console.log("cpu cards from cpuFrame: ",cpu);
     var cards = [];
     for (var i = 0; i <cpu.length; i ++) {
       cards.push(

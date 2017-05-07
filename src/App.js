@@ -15,31 +15,52 @@ import RequestFrame from './components/RequestFrame';
 class Game extends React.Component{
   constructor(props) {
     super(props);
-    this.myTurn.bind(this);
-    this.deal.bind(this);
+    this.myTurn=this.myTurn.bind(this);
+    this.deal=this.deal.bind(this);
+    this.goGoose=this.goGoose.bind(this);
     this.state = {
       cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
               "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"],
       hand: [],
       cpu: [],
-      turn: 1,
+      turn: 0,
       endOfTurn: false,
       cpuRequest: "",
+      cpuChosenAskingCard: "",
       request: "",
+      disabledCards: [],
     };
 
+  }
+
+  componentWillMount () {
     this.deal(this.state.cards, this.state.cpu, this.state.hand);
   }
 
   componentDidMount() {
 
-    this.setState ({
-      cpuRequest: this.cpuRequest(),
-      }
-    );
+    this.cpuTurn();
   }
 
+  playerResponse (hand, cpuChosenAskingCard, request) {
+    var disabledCards = [];
+    if (this.check(hand, cpuChosenAskingCard)) {
+      for (var i = 0; i < hand.length; i++) {
+        if (hand[i][1] !== cpuChosenAskingCard[1]) {
+          disabledCards.push(hand[i]);
+        }
+      }
+    }
+    else {
+      console.log("click the gofish button");
+      disabledCards = hand;
+    }
+
+    this.setState ({
+      disabledCards: disabledCards,
+    })
+  }
 
   /* game () {
     if (this.state.turn%2 === 0){
@@ -50,24 +71,36 @@ class Game extends React.Component{
       console.log("cpu turn");
       //Call function CpuTurn
     }
-  },
-
-  check: function(x, request) {
-    for (var i = 0; i < x.length; i++) {
-        if (x[i] == "c" + request || x[i] == "s" + request || x[i] == "h" + request || x[i] == "d" + request) {
-          return true;
-        }
-    }
-  }, */
+  }*/
 
   cpuTurn() {
 
+    var cards = this.state.cards;
+    var request = this.state.request;
+    var cpuRequest = this.state.cpuRequest;
+    var hand = this.state.hand;
+    var cpu = this.state.cpu;
+    var cpuChosenAskingCard = this.state.cpuChosenAskingCard;
+    var endOfTurn = this.state.endOfTurn;
+    var turn = this.state.turn;
+
+    endOfTurn = false;
+
+    cpuChosenAskingCard = this.chooseAskingCard(cpu)
+    cpuRequest= this.cpuRequest(cpuChosenAskingCard);
+    this.playerResponse(hand, cpuChosenAskingCard, request);
+
+    this.setState({
+      cpuRequest: cpuRequest,
+      cpuChosenAskingCard: cpuChosenAskingCard,
+    });
   }
 
   myTurn() {
 
     var cards = this.state.cards;
     var request = this.state.request;
+    var cpuRequest = this.state.cpuRequest;
     var hand = this.state.hand;
     var cpu = this.state.cpu;
     var endOfTurn = this.state.endOfTurn;
@@ -77,9 +110,9 @@ class Game extends React.Component{
 
     var checkRequest = this.check(hand, request);
 
-    if (checkRequest === true) {
+    if (checkRequest) {
         var checkOpponent = this.check(cpu, request);
-        if (checkOpponent === true) {
+        if (checkOpponent) {
 
             var a = cpu.indexOf("c" + request);
             if (a != -1) {
@@ -113,7 +146,7 @@ class Game extends React.Component{
 
         }
         else {
-            console.log("Go fish!"); //you have to take a card from the deck
+            cpuRequest = "Go Fish!"; //you have to take a card from the deck
             this.drawCardHand;
             turn++;
             endOfTurn = true;
@@ -124,6 +157,7 @@ class Game extends React.Component{
 
         this.setState(
           { cards: cards,
+            cpuRequest: cpuRequest,
             request: request,
             hand: hand,
             cpu: cpu,
@@ -250,10 +284,9 @@ class Game extends React.Component{
 
   }*/
 
-  cpuRequest() {
+  cpuRequest(chosenAskingCard) {
 
     var request = "";
-    var chosenAskingCard = this.chooseAskingCard(this.state.cpu);
 
     if (chosenAskingCard==='c2' || chosenAskingCard === 'd2' || chosenAskingCard==='s2' || chosenAskingCard === 'h2')
     {
@@ -312,16 +345,17 @@ class Game extends React.Component{
 
   chooseAskingCard(cpu) {
     var value = Math.floor(Math.random() * cpu.length);
-    console.log("in function chooseAskingCard, value is:", cpu[value]);
     return cpu[value];
   }
 
   check(x, request) {
     for (var i = 0; i < x.length; i++) {
-      if (x[i] == "c" + request || x[i] == "s" + request || x[i] == "h" + request || x[i] == "d" + request) {
+      if (x[i][1] == request[1]) {
           return true;
       }
     }
+    console.log("invalid request (from check function)");
+    return false;
   }
 
   shuffle(cards) {
@@ -334,6 +368,14 @@ class Game extends React.Component{
 
     }
     this.setState({ cards: cards });
+  }
+
+  onUpdate(request) {
+    this.setState ({ request:request})
+  }
+
+  goGoose() {
+      this.setState({ request: "Go Goose!"})
   }
 
   render(){
@@ -352,11 +394,13 @@ class Game extends React.Component{
           shuffle= {this.shuffle.bind(this)}
           drawCardHand= {this.drawCardHand.bind(this)}
           hand= {this.state.hand}
-          cpu= {this.state.cpu}/>
+          cpu= {this.state.cpu}
+          disabledCards={this.state.disabledCards}
+          goGoose={this.goGoose}/>
           <div id="container2">
             <HandFrame hand= {this.state.hand}/>
-            <MyBubbleFrame turn ={this.state.turn}/>
-            <RequestFrame request = {this.state.request} turn = {this.state.turn}/>
+            <MyBubbleFrame request = {this.state.request}/>
+            <RequestFrame onUpdate={this.onUpdate.bind(this)} request = {this.state.request} turn = {this.state.turn}/>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ class CpuBubbleFrame extends React.Component {
   render () {
 
     var className = "";
-    var hidden = (this.props.turn)%2===0;
+    var hidden = this.props.request.length===0;
 
     if(hidden){
       className = "hidden";

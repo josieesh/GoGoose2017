@@ -6,7 +6,6 @@ class DeckFrame extends React.Component{
 
     var cards = this.props.cards;
 
-    console.log("deck frame cards:", cards);
     var deck = [];
     for (var i = 0; i <cards.length; i ++) {
       deck.push(
