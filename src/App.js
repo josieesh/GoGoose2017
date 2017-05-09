@@ -18,6 +18,7 @@ class Game extends React.Component{
     this.myTurn=this.myTurn.bind(this);
     this.deal=this.deal.bind(this);
     this.goGoose=this.goGoose.bind(this);
+    this.onUpdate=this.onUpdate.bind(this);
     this.state = {
       cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
@@ -101,67 +102,60 @@ class Game extends React.Component{
 
   myTurn() {
 
-    this.setState({
-      cpuRequest: "",
-      cpuChosenAskingCard: "",
-    });
+    console.log("myTurn invoked");
 
     var cards = this.state.cards;
     var request = this.state.request;
     var cpuRequest = this.state.cpuRequest;
     var hand = this.state.hand;
     var cpu = this.state.cpu;
-    var endOfTurn = this.state.endOfTurn;
     var turn = this.state.turn;
+    var endOfTurn = this.state.endOfTurn;
 
-    endOfTurn = false;
+    console.log("cpu cards from myTurn function:", cpu);
 
-    var checkRequest = this.check(hand, request);
+    console.log("does cpu have this card?",this.checkInput(cpu, request));
 
-    if (checkRequest) {
-        var checkOpponent = this.check(cpu, request);
-        if (checkOpponent) {
+        if (this.checkInput(cpu, request)) {
 
-            var a = cpu.indexOf("c" + request);
+            cpuRequest="Yep!"
+            var a = cpu.indexOf("c" + request[0]);
             if (a != -1) {
               hand.unshift(cpu[a]);
               cpu.splice(a, 1);
             }
 
-            var b = cpu.indexOf("s" + request);
+            var b = cpu.indexOf("s" + request[0]);
             if (b != -1) {
               hand.unshift(cpu[b]);
               cpu.splice(b, 1);
             }
 
-            var c = cpu.indexOf("h" + request);
+            var c = cpu.indexOf("h" + request[0]);
             if (c != -1) {
               hand.unshift(cpu[c]);
               cpu.splice(c, 1);
             }
 
-            var d = cpu.indexOf("d" + request);
+            var d = cpu.indexOf("d" + request[0]);
             if (d != -1) {
               hand.unshift(cpu[d]);
               cpu.splice(d, 1);
             }
 
-            this.checkArray(hand);
+            //this.checkArray(hand);
 
             if (cpu.length === 0) {
-                this.drawCardCpu(this.state.cards, cpu); //this is in case that i take the computer's last card but there are still cards in the deck. the cpu has to draw
+                this.drawCardCpu(cards, cpu); //this is in case that i take the computer's last card but there are still cards in the deck. the cpu has to draw
             }
 
         }
         else {
-            cpuRequest = "Go Fish!"; //you have to take a card from the deck
-            this.drawCardHand;
-            turn++;
+            cpuRequest = "Go Goose!"; //you have to take a card from the deck
             endOfTurn = true;
-            if (hand[0] === ("c" + request) || hand[0] === ("d" + request) || hand [0] === ("h" + request) || hand[0] === ("s" + request)) {
-                turn++; //basically sets turn back to an even value which means player will go again
+            //if (hand[0] === ("c" + request) || hand[0] === ("d" + request) || hand [0] === ("h" + request) || hand[0] === ("s" + request)) {
+                //turn++; //basically sets turn back to an even value which means player will go again
             }
-        }
 
         this.setState(
           { cards: cards,
@@ -172,10 +166,6 @@ class Game extends React.Component{
             endOfTurn: endOfTurn,
             turn: turn }
         );
-    }
-    else {
-        console.log("Invalid request, try again")
-    }
   }
 
   deal(cards, cpu, hand) {
@@ -212,17 +202,35 @@ class Game extends React.Component{
   drawCardHand(cards, hand) {
 
     if (cards.length !== 0) {
-        hand.unshift(cards[0]);
-        cards.shift();
-        //checkArray(hand);
+      hand.unshift(cards[0]);
+      cards.shift();
+      //checkArray(hand);
+      if(this.state.request.length > 0) {
 
         this.setState(
           { hand: hand,
-            cards: cards }
+            cards: cards,
+            cpuRequest: ""}
         );
+
+        console.log("asdkjfhsadgl", this.state.hand[0][1]);
+        console.log("asdkahksajkdsak", this.state.request[0]);
+
+        if(this.state.hand[0][1] === this.state.request[0]) {
+          this.setState({
+            request: "I drew what I asked for!"
+          });
+        }
+        else {
+          this.setState({
+            request: ""
+          }, this.cpuTurn());
+        }
+      }
+
     }
     /*else {
-        alert('cannot draw card, deck is empty');
+        console.log('cannot draw card, deck is empty');
     } */
   }
 
@@ -358,11 +366,22 @@ class Game extends React.Component{
 
   check(x, request) {
     for (var i = 0; i < x.length; i++) {
-      if (x[i][1] == request[1]) {
+      if (x[i][1] === request[1]) {
           return true;
       }
     }
     console.log("invalid request (from check function)");
+    return false;
+  }
+
+  checkInput(x, request) {
+
+    for (var i=0; i<x.length; i++) {
+      if(x[i][1] === request[0]) {
+        return true;
+      }
+    }
+    console.log("cannnot ask for that, try again");
     return false;
   }
 
@@ -379,17 +398,27 @@ class Game extends React.Component{
   }
 
   onUpdate(request) {
-    this.setState ({ request:request})
+
+    if(this.checkInput(this.state.hand, request)){
+      this.setState ({ request: request}, this.myTurn());
+    }
+    else {
+      this.setState({
+        request: "",
+      });
+    }
   }
 
   goGoose() {
       this.setState({ request: "Go Goose!"});
-      this.drawCardCpu(this.state.cards, this.state.cpu);
-      if(this.state.cpu === this.state.cpuChosenAskingCard) {
-        this.cpuTurn();
+      setTimeout(function() { this.drawCardCpu(this.state.cards, this.state.cpu); }.bind(this), 1000);
+      if(this.state.cpu[0] === this.state.cpuChosenAskingCard) {
+        setTimeout(function() {this.setState({cpuRequest: "I drew a what I asked for, so I go again",}); }.bind(this), 1000);
+
+        setTimeout(function() {this.cpuTurn(); }.bind(this), 1000);
       }
       else {
-        this.myTurn();
+        setTimeout(function () {this.setState({cpuRequest: "Your turn", cpuChosenAskingCard: "", request: ""}/*insert callback function that just console logs so that state is always updated*/); }.bind(this), 1000);
       }
   }
 
@@ -404,19 +433,21 @@ class Game extends React.Component{
     }
     else {
       hand.splice(hand.indexOf(card),1);
-      cpu.push(card);
+      cpu.unshift(card);
       this.setState({
         hand: hand,
         cpu: cpu,
         cpuRequest: "",
         cpuChosenAskingCard: "",
       });
+      console.log("checking if disabled cards = number of hand cards", disabledCards.length===hand.length);
 
       if (disabledCards.length === hand.length) { //this checks to see if there are any other cards to be sent to cpu before calling cpuTurn again
         this.cpuTurn();
       }
     }
   }
+
   render(){
 
     return(
@@ -434,12 +465,13 @@ class Game extends React.Component{
           drawCardHand= {this.drawCardHand.bind(this)}
           hand= {this.state.hand}
           cpu= {this.state.cpu}
+          cpuRequest={this.state.cpuRequest}
           disabledCards={this.state.disabledCards}
-          goGoose={this.goGoose}/>
+          goGoose={this.goGoose.bind(this)}/>
           <div id="container2">
             <HandFrame disabledCards={this.state.disabledCards} hand= {this.state.hand} sendCardToCpu={this.sendCardToCpu.bind(this)}/>
             <MyBubbleFrame request = {this.state.request}/>
-            <RequestFrame onUpdate={this.onUpdate.bind(this)} request = {this.state.request} turn = {this.state.turn}/>
+            <RequestFrame onUpdate={this.onUpdate} request = {this.state.request} turn = {this.state.turn}/>
           </div>
         </div>
       </div>

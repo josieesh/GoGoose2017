@@ -21,13 +21,19 @@ class HandFrame extends React.Component{
   render () {
     var hand = this.props.hand;
     var cards = [];
-    var disabledCards = this.props.disabledCards;
+
+    /*cards=hand.map(function(card, i){
+      return <span key={i} className="card" id={card[i]} onClick={this.props.sendCardToCpu.bind(null, card[i])}> </span>;
+    });*/
+
+    //var disabledCards = this.props.disabledCards;
 
     for (var i = 0; i <hand.length; i ++) {
       cards.push(
         <span key={i} className="card" id={hand[i]} onClick={this.props.sendCardToCpu.bind(null, hand[i])}> </span>
       )
     }
+    
     return (
 
       <div id = "hand-frame">
