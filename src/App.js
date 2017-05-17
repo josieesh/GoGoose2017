@@ -10,7 +10,101 @@ import DeckFrame from './components/DeckFrame';
 import CpuBubbleFrame from './components/CpuBubbleFrame';
 import RequestFrame from './components/RequestFrame';
 
+import {createStore, applyMiddleware, compose, redux} from 'redux';
+import {createLogger} from 'redux-logger';
+import thunkMiddleware from 'redux-thunk';
 
+import reducer from 'reducer-redux';
+
+
+const logger = createLogger();
+
+var defaultState = {
+  cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
+          "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
+          "dk", "dq", "dj", "d10", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2"],
+  hand: [],
+  cpu: [],
+  cpuRequest: "",
+  cpuChosenAskingCard: "",
+  request: "",
+  disabledCards: [],
+};
+
+
+function changeRequest(request) {
+  return {
+    type: 'CHANGE_REQUEST',
+    data: {request}
+  };
+}
+
+function changeCards (cards) {
+  return {
+    type: 'CHANGE_CARDS',
+    data: {cards}
+  };
+}
+
+function changeHand (hand) {
+  return {
+    type: 'CHANGE_HAND',
+    data: {hand}
+  };
+}
+
+function changeCpu (cpu) {
+  return {
+    type: 'CHANGE_CPU',
+    data: {cpu}
+  };
+}
+
+function stateApp(state, action) {
+  switch (action.type) {
+    case "CHANGE_REQUEST":
+      var newState = Object.assign({}, state);
+
+      newState.request=action.request;
+
+      return newState;
+
+    case "CHANGE_CARDS":
+      var newState= Object.assign({}, state);
+
+      newState.cards=action.cards;
+
+      return newState;
+
+    case "CHANGE_HAND":
+      var newState=Object.assign({}, state);
+
+      newState.hand=action.hand;
+
+      return newState;
+
+    case "CHANGE_CPU":
+      var newState=Object.assign({}, state);
+
+      newState.cpu=action.cpu;
+
+      return newState;
+
+    default:
+      return state;
+  }
+
+}
+
+var store = createStore(stateApp, defaultState);
+store.subscribe (() =>
+  console.log(store.getState())
+)
+
+store.dispatch({type: 'CHANGE_REQUEST'})
+store.dispatch({type: 'CHANGE_CARDS'})
+store.dispatch({type: 'CHANGE_HAND'})
+store.dispatch({type: 'CHANGE_CPU'})
 
 class Game extends React.Component{
   constructor(props) {
@@ -19,6 +113,17 @@ class Game extends React.Component{
     this.deal=this.deal.bind(this);
     this.goGoose=this.goGoose.bind(this);
     this.onUpdate=this.onUpdate.bind(this);
+    this.cpuTurn=this.cpuTurn.bind(this);
+    this.disableCards= this.disableCards.bind(this);
+    this.drawCardHand = this.drawCardHand.bind(this);
+    this.drawCardCpu = this.drawCardCpu.bind(this);
+    this.cpuRequest = this.cpuRequest.bind(this);
+    this.chooseAskingCard = this.chooseAskingCard.bind(this);
+    this.checkInput = this.checkInput.bind(this);
+    this.shuffle = this.shuffle.bind(this);
+    this.check = this.check.bind(this);
+    this.sendCardToCpu = this.sendCardToCpu.bind(this);
+    this.drawCardHandInitial = this.drawCardHandInitial.bind(this);
     this.state = {
       cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
@@ -40,20 +145,10 @@ class Game extends React.Component{
   }
 
   componentDidMount() {
-
-    this.cpuTurn();
+    if(this.state.cpuRequest.length === 0) {
+      this.cpuTurn();
+    }
   }
-
-  /* game () {
-    if (this.state.turn%2 === 0){
-      console.log("my turn");
-      //call function MyTurn
-    }
-    else {
-      console.log("cpu turn");
-      //Call function CpuTurn
-    }
-  }*/
 
   cpuTurn() {
 
@@ -65,22 +160,23 @@ class Game extends React.Component{
     var hand = this.state.hand;
     var cpu = this.state.cpu;
     var cpuChosenAskingCard = this.state.cpuChosenAskingCard;
-    var endOfTurn = this.state.endOfTurn;
     var turn = this.state.turn;
 
-    endOfTurn = false;
+    cpuChosenAskingCard = this.chooseAskingCard(cpu);
+    console.log(cpuChosenAskingCard);
 
-    cpuChosenAskingCard = this.chooseAskingCard(cpu)
     cpuRequest= this.cpuRequest(cpuChosenAskingCard);
-    this.playerResponse(hand, cpuChosenAskingCard, request);
+    this.disableCards(hand, cpuChosenAskingCard);
 
     this.setState({
+      request: "",
       cpuRequest: cpuRequest,
       cpuChosenAskingCard: cpuChosenAskingCard,
     });
+    console.log("ending cpuTurn function execution");
   }
 
-  playerResponse (hand, cpuChosenAskingCard, request) {
+  disableCards (hand, cpuChosenAskingCard) {
     var disabledCards = [];
     if (this.check(hand, cpuChosenAskingCard)) {
       for (var i = 0; i < hand.length; i++) {
@@ -96,23 +192,18 @@ class Game extends React.Component{
 
     this.setState ({
       disabledCards: disabledCards,
-    })
-    console.log("disabled cards:", disabledCards);
+    });
+    console.log("disabled cards from disableCards:", disabledCards);
   }
 
-  myTurn() {
+  myTurn(request) {
 
     console.log("myTurn invoked");
 
     var cards = this.state.cards;
-    var request = this.state.request;
     var cpuRequest = this.state.cpuRequest;
     var hand = this.state.hand;
     var cpu = this.state.cpu;
-    var turn = this.state.turn;
-    var endOfTurn = this.state.endOfTurn;
-
-    console.log("cpu cards from myTurn function:", cpu);
 
     console.log("does cpu have this card?",this.checkInput(cpu, request));
 
@@ -152,20 +243,18 @@ class Game extends React.Component{
         }
         else {
             cpuRequest = "Go Goose!"; //you have to take a card from the deck
-            endOfTurn = true;
             //if (hand[0] === ("c" + request) || hand[0] === ("d" + request) || hand [0] === ("h" + request) || hand[0] === ("s" + request)) {
                 //turn++; //basically sets turn back to an even value which means player will go again
             }
-
+      setTimeout(function() {
         this.setState(
           { cards: cards,
             cpuRequest: cpuRequest,
-            request: request,
+            request: "",
             hand: hand,
-            cpu: cpu,
-            endOfTurn: endOfTurn,
-            turn: turn }
-        );
+            cpu: cpu }
+        ); }.bind(this), 1000);
+
   }
 
   deal(cards, cpu, hand) {
@@ -173,7 +262,7 @@ class Game extends React.Component{
     this.shuffle(cards);
 
     for(var i = 0; i <5; i ++) {
-        this.drawCardHand(cards, hand);
+        this.drawCardHandInitial(cards, hand);
     };
 
     for(var j = 0; j <5; j++) {
@@ -184,6 +273,8 @@ class Game extends React.Component{
 
   drawCardCpu(cards, cpu) {
 
+    console.log("drawCardCpu called");
+
     if (cards.length !== 0) {
       cpu.unshift(cards[0]);
       cards.shift();
@@ -191,7 +282,7 @@ class Game extends React.Component{
 
       this.setState (
         { cards: cards,
-          cpu: cpu }
+          cpu: cpu }, () => { console.log("setState called in drawCardCpu"); }
       );
     }
     else {
@@ -201,37 +292,51 @@ class Game extends React.Component{
 
   drawCardHand(cards, hand) {
 
+    console.log("drawCardHand called");
+
     if (cards.length !== 0) {
       hand.unshift(cards[0]);
       cards.shift();
       //checkArray(hand);
-      if(this.state.request.length > 0) {
 
-        this.setState(
-          { hand: hand,
-            cards: cards,
-            cpuRequest: ""}
-        );
+      console.log("inside the second if statement in drawCardHand");
 
-        console.log("asdkjfhsadgl", this.state.hand[0][1]);
-        console.log("asdkahksajkdsak", this.state.request[0]);
-
-        if(this.state.hand[0][1] === this.state.request[0]) {
-          this.setState({
-            request: "I drew what I asked for!"
-          });
-        }
-        else {
-          this.setState({
-            request: ""
-          }, this.cpuTurn());
-        }
+      this.setState(
+        { hand: hand,
+          cards: cards,
+          cpuRequest: "",
+          request: ""}
+      );
+      //the following if else statements are being called on initial deal. they should only get called when user clicks on the draw card button
+      if(this.state.hand[0][1] === this.state.request[0]) {
+        this.setState({
+          request: "I drew what I asked for!"
+        });
+      }
+      else {
+        this.setState({
+          request: ""
+        }, this.cpuTurn());
       }
 
     }
-    /*else {
+    else {
         console.log('cannot draw card, deck is empty');
-    } */
+    }
+  }
+
+  drawCardHandInitial(cards, hand) {
+
+    if (cards.length !== 0) {
+      hand.unshift(cards[0]);
+      cards.shift();
+      //checkArray(hand);
+
+      this.setState(
+        { hand: hand,
+          cards: cards}
+      );
+    }
   }
 
   /*countInArray: function(array, what) {
@@ -376,7 +481,11 @@ class Game extends React.Component{
 
   checkInput(x, request) {
 
+    console.log("request from checkinput:", request);
+
     for (var i=0; i<x.length; i++) {
+      console.log(x[i][1]);
+
       if(x[i][1] === request[0]) {
         return true;
       }
@@ -399,8 +508,10 @@ class Game extends React.Component{
 
   onUpdate(request) {
 
+    console.log("calling onUpdate function in game");
+
     if(this.checkInput(this.state.hand, request)){
-      this.setState ({ request: request}, this.myTurn());
+      this.setState({ request:request }, this.myTurn(request));
     }
     else {
       this.setState({
@@ -412,13 +523,15 @@ class Game extends React.Component{
   goGoose() {
       this.setState({ request: "Go Goose!"});
       setTimeout(function() { this.drawCardCpu(this.state.cards, this.state.cpu); }.bind(this), 1000);
-      if(this.state.cpu[0] === this.state.cpuChosenAskingCard) {
-        setTimeout(function() {this.setState({cpuRequest: "I drew a what I asked for, so I go again",}); }.bind(this), 1000);
+
+      if(this.state.cpu[0][1] === this.state.cpuChosenAskingCard[1]) {
+        console.log("invoking I drew what I asked for, so I go again");
+        setTimeout(function() {this.setState({cpuRequest: "I drew a what I asked for, so I go again"}); }.bind(this), 1000);
 
         setTimeout(function() {this.cpuTurn(); }.bind(this), 1000);
       }
       else {
-        setTimeout(function () {this.setState({cpuRequest: "Your turn", cpuChosenAskingCard: "", request: ""}/*insert callback function that just console logs so that state is always updated*/); }.bind(this), 1000);
+        setTimeout(function () {this.setState({cpuRequest: "Your turn", cpuChosenAskingCard: "", request: "", disabledCards: []}, () => { console.log("setState called");}); }.bind(this), 1000);
       }
   }
 
@@ -461,17 +574,17 @@ class Game extends React.Component{
           <DeckFrame cards= {this.state.cards}/>
           <ButtonFrame
           cards= {this.state.cards}
-          shuffle= {this.shuffle.bind(this)}
-          drawCardHand= {this.drawCardHand.bind(this)}
+          shuffle= {this.shuffle}
+          drawCardHand= {this.drawCardHand}
           hand= {this.state.hand}
           cpu= {this.state.cpu}
           cpuRequest={this.state.cpuRequest}
           disabledCards={this.state.disabledCards}
-          goGoose={this.goGoose.bind(this)}/>
+          goGoose={this.goGoose}/>
           <div id="container2">
             <HandFrame disabledCards={this.state.disabledCards} hand= {this.state.hand} sendCardToCpu={this.sendCardToCpu.bind(this)}/>
             <MyBubbleFrame request = {this.state.request}/>
-            <RequestFrame onUpdate={this.onUpdate} request = {this.state.request} turn = {this.state.turn}/>
+            <RequestFrame onUpdate={this.onUpdate} request={this.state.request}/>
           </div>
         </div>
       </div>

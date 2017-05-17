@@ -8,7 +8,12 @@ class ButtonFrame extends React.Component {
     var disabledCards = this.props.disabledCards;
 
     if (hand === disabledCards){
-      return false;
+      if (this.props.cpuRequest === "Your turn") {
+        return true;
+      }
+      else {
+        return false;
+      }
     }
     else {
       return true;
@@ -23,7 +28,6 @@ class ButtonFrame extends React.Component {
 
     return (
       <div>
-        <button onClick={this.props.shuffle.bind(null,cards)}> Shuffle </button>
          <button onClick={this.props.drawCardHand.bind(null, cards, hand)} disabled={this.props.cpuRequest != "Go Goose!"}>Draw Card </button>
          <button onClick={this.props.goGoose.bind(this)} disabled={this.found()}>Go Goose!</button>
       </div>

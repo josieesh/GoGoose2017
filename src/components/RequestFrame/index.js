@@ -13,6 +13,7 @@ class RequestFrame extends React.Component {
     console.log(request);
 
     if(request.length != 0) {
+      this.refs.simpleForm.value =""; // this should clear the form after request is sent back to parent
       this.props.onUpdate(request);
     }
   }
@@ -22,7 +23,7 @@ class RequestFrame extends React.Component {
     return (
     <div>
       <input type='text' ref='simpleForm'/>
-      <input type='button' onClick={this.update} disabled={!(this.props.turn)%2 === 0} value='Ask'/>
+      <input type='button' onClick={this.update} disabled={this.props.request !== ""} value='Ask'/>
     </div>
 
     );

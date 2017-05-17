@@ -13,7 +13,9 @@ class CpuBubbleFrame extends React.Component {
 
     return (
       <div className={className} id="cpuspeechbubble">
+      <span>
         <p>{this.props.request}</p>
+      </span>
       </div>
     );
   }
