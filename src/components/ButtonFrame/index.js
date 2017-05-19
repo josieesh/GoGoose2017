@@ -27,8 +27,7 @@ class ButtonFrame extends React.Component {
     var cpu = this.props.cpu;
 
     return (
-      <div>
-         <button onClick={this.props.drawCardHand.bind(null, cards, hand)} disabled={this.props.cpuRequest != "Go Goose!"}>Draw Card </button>
+      <div id="button-frame">
          <button onClick={this.props.goGoose.bind(this)} disabled={this.found()}>Go Goose!</button>
       </div>
     );

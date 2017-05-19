@@ -124,6 +124,7 @@ class Game extends React.Component{
     this.check = this.check.bind(this);
     this.sendCardToCpu = this.sendCardToCpu.bind(this);
     this.drawCardHandInitial = this.drawCardHandInitial.bind(this);
+    this.removeGroupsOfFour =this.removeGroupsOfFour.bind(this);
     this.state = {
       cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
@@ -151,6 +152,8 @@ class Game extends React.Component{
   }
 
   cpuTurn() {
+
+    this.removeGroupsOfFour(this.state.cpu);
 
     console.log("calling cpuTurn");
 
@@ -197,6 +200,8 @@ class Game extends React.Component{
   }
 
   myTurn(request) {
+
+    this.removeGroupsOfFour(this.state.hand);
 
     console.log("myTurn invoked");
 
@@ -339,7 +344,7 @@ class Game extends React.Component{
     }
   }
 
-  /*countInArray: function(array, what) {
+  countInArray (array, what) {
     var count = 0;
     for (var i = 0; i < array.length; i++) {
         if (array[i].includes(what)) {
@@ -347,63 +352,73 @@ class Game extends React.Component{
         }
     }
     return count;
-  },
+  }
 
-  checkArray: function(array) {
+  moveToFront (index, array) {
+    var card = array[index];
+    array.splice(index, 1);
+    array.unshift(card);
+    return array;
+  }
+
+  removeGroupsOfFour (array) {
+
     for (var i = 2; i < 11; i++) {
 
-        if (countInArray(array, i) == 4) {
-            moveToFront(array.indexOf("c" +i), array);
-            moveToFront(array.indexOf("s" +i), array);
-            moveToFront(array.indexOf("d" +i), array);
-            moveToFront(array.indexOf("h" +i), array);
+        if (this.countInArray(array, i) === 4) {
+            array = this.moveToFront(array.indexOf("c" +i), array);
+            array = this.moveToFront(array.indexOf("s" +i), array);
+            array = this.moveToFront(array.indexOf("d" +i), array);
+            array = this.moveToFront(array.indexOf("h" +i), array);
 
-            array.splice(0,4);
+            array.splice(0,4); //removes the group of four identical cards from front of array
 
         }
     }
 
-    if (countInArray(array, "j") == 4) {
+    if (this.countInArray(array, "j") === 4) {
 
-        moveToFront(array.indexOf("cj"), array);
-        moveToFront(array.indexOf("sj"), array);
-        moveToFront(array.indexOf("dj"), array);
-        moveToFront(array.indexOf("hj"), array);
-
-        array.splice(0,4);
-    }
-
-    if (countInArray(array, "q") == 4) {
-
-        moveToFront(array.indexOf("cq"), array);
-        moveToFront(array.indexOf("sq"), array);
-        moveToFront(array.indexOf("dq"), array);
-        moveToFront(array.indexOf("hq"), array);
+        array = this.moveToFront(array.indexOf("cj"), array);
+        array = this.moveToFront(array.indexOf("sj"), array);
+        array = this.moveToFront(array.indexOf("dj"), array);
+        array = this.moveToFront(array.indexOf("hj"), array);
 
         array.splice(0,4);
     }
 
-    if (countInArray(array, "k") == 4 ) {
+    if (this.countInArray(array, "q") === 4) {
 
-        moveToFront(array.indexOf("ck"), array);
-        moveToFront(array.indexOf("sk"), array);
-        moveToFront(array.indexOf("dk"), array);
-        moveToFront(array.indexOf("hk"), array);
-
-        array.splice(0,4);
-    }
-
-    if (countInArray(array, "a") == 4) {
-
-        moveToFront(array.indexOf("ca"), array);
-        moveToFront(array.indexOf("sa"), array);
-        moveToFront(array.indexOf("da"), array);
-        moveToFront(array.indexOf("ha"), array);
+        array = this.moveToFront(array.indexOf("cq"), array);
+        array = this.moveToFront(array.indexOf("sq"), array);
+        array = this.moveToFront(array.indexOf("dq"), array);
+        array = this.moveToFront(array.indexOf("hq"), array);
 
         array.splice(0,4);
     }
 
-  }*/
+    if (this.countInArray(array, "k") === 4 ) {
+
+        array = this.moveToFront(array.indexOf("ck"), array);
+        array = this.moveToFront(array.indexOf("sk"), array);
+        array = this.moveToFront(array.indexOf("dk"), array);
+        array = this.moveToFront(array.indexOf("hk"), array);
+
+        array.splice(0,4);
+    }
+
+    if (this.countInArray(array, "a") === 4) {
+
+        array = this.moveToFront(array.indexOf("ca"), array);
+        array = this.moveToFront(array.indexOf("sa"), array);
+        array = this.moveToFront(array.indexOf("da"), array);
+        array = this.moveToFront(array.indexOf("ha"), array);
+
+        array.splice(0,4);
+    }
+
+    return array;
+
+  }
 
   cpuRequest(chosenAskingCard) {
 
@@ -540,23 +555,25 @@ class Game extends React.Component{
     var cpu = this.state.cpu;
     var disabledCards = this.state.disabledCards;
 
-    if (disabledCards.indexOf(card) != -1) {
-      alert("cannot click this card");
+    if(this.state.cpuRequest !== "Your turn"){
+      if (disabledCards.indexOf(card) != -1) {
+        alert("cannot click this card");
 
-    }
-    else {
-      hand.splice(hand.indexOf(card),1);
-      cpu.unshift(card);
-      this.setState({
-        hand: hand,
-        cpu: cpu,
-        cpuRequest: "",
-        cpuChosenAskingCard: "",
-      });
-      console.log("checking if disabled cards = number of hand cards", disabledCards.length===hand.length);
+      }
+      else {
+        hand.splice(hand.indexOf(card),1);
+        cpu.unshift(card);
+        this.setState({
+          hand: hand,
+          cpu: cpu,
+          cpuRequest: "",
+          cpuChosenAskingCard: "",
+        });
+        console.log("checking if disabled cards = number of hand cards", disabledCards.length===hand.length);
 
-      if (disabledCards.length === hand.length) { //this checks to see if there are any other cards to be sent to cpu before calling cpuTurn again
-        this.cpuTurn();
+        if (disabledCards.length === hand.length) { //this checks to see if there are any other cards to be sent to cpu before calling cpuTurn again
+          this.cpuTurn();
+        }
       }
     }
   }
@@ -571,21 +588,27 @@ class Game extends React.Component{
           <CpuFrame cpu= {this.state.cpu}
                     cards={this.state.cards}/>
           <CpuBubbleFrame request={this.state.cpuRequest} turn={this.state.turn}/>
-          <DeckFrame cards= {this.state.cards}/>
-          <ButtonFrame
-          cards= {this.state.cards}
-          shuffle= {this.shuffle}
-          drawCardHand= {this.drawCardHand}
-          hand= {this.state.hand}
-          cpu= {this.state.cpu}
-          cpuRequest={this.state.cpuRequest}
-          disabledCards={this.state.disabledCards}
-          goGoose={this.goGoose}/>
+          <DeckFrame cards= {this.state.cards}
+                      drawCardHand= {this.drawCardHand}
+                      hand={this.state.hand}
+                      cpuRequest={this.state.cpuRequest}
+                      drawCardHand={this.drawCardHand}/>
+        </div>
           <div id="container2">
             <HandFrame disabledCards={this.state.disabledCards} hand= {this.state.hand} sendCardToCpu={this.sendCardToCpu.bind(this)}/>
             <MyBubbleFrame request = {this.state.request}/>
-            <RequestFrame onUpdate={this.onUpdate} request={this.state.request}/>
-          </div>
+            <div>
+              <RequestFrame onUpdate={this.onUpdate} request={this.state.request}/>
+              <ButtonFrame
+              cards= {this.state.cards}
+              shuffle= {this.shuffle}
+              drawCardHand= {this.drawCardHand}
+              hand= {this.state.hand}
+              cpu= {this.state.cpu}
+              cpuRequest={this.state.cpuRequest}
+              disabledCards={this.state.disabledCards}
+              goGoose={this.goGoose}/>
+            </div>
         </div>
       </div>
     );
@@ -612,7 +635,7 @@ class App extends React.Component {
     return (
         <div>
         <ActiveGame />
-        <button onClick={this.newGame} >New Game</button>
+        <button id="newgame-button" onClick={this.newGame} >New Game</button>
       </div>
     );
   }
