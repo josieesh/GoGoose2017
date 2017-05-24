@@ -1,3 +1,7 @@
+body {
+  background-color: grey;
+}
+
 .hidden {
   display:none;
 }
@@ -19,7 +23,7 @@
 }
 
 #facedown-deck {
-  background-image: url("http://teachersnetwork.org/images/cover2.jpg");
+  background-image:  url("./images/facedown.jpg");
   position: absolute;
   top: 0px;
   left: 0px;
@@ -84,7 +88,7 @@ button {
 }
 
 #facedown {
-  background-image: url("http://teachersnetwork.org/images/cover2.jpg");
+  background-image: url("./images/facedown.jpg");
   cursor: default;
 }
 

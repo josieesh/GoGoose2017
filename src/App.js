@@ -124,7 +124,8 @@ class Game extends React.Component{
     this.check = this.check.bind(this);
     this.sendCardToCpu = this.sendCardToCpu.bind(this);
     this.drawCardHandInitial = this.drawCardHandInitial.bind(this);
-    this.removeGroupsOfFour =this.removeGroupsOfFour.bind(this);
+    this.removeMyGroupsOfFour =this.removeMyGroupsOfFour.bind(this);
+    this.removeCpuGroupsOfFour = this.removeCpuGroupsOfFour.bind(this);
     this.state = {
       cards: ["ca", "ck", "cq", "cj", "c10", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2","sa", "sk", "sq", "sj", "s10", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2",
               "ha", "hk", "hq", "hj", "h10", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "da",
@@ -137,6 +138,8 @@ class Game extends React.Component{
       cpuChosenAskingCard: "",
       request: "",
       disabledCards: [],
+      myGroups: [],
+      cpuGroups: []
     };
 
   }
@@ -152,8 +155,6 @@ class Game extends React.Component{
   }
 
   cpuTurn() {
-
-    this.removeGroupsOfFour(this.state.cpu);
 
     console.log("calling cpuTurn");
 
@@ -176,6 +177,8 @@ class Game extends React.Component{
       cpuRequest: cpuRequest,
       cpuChosenAskingCard: cpuChosenAskingCard,
     });
+
+    this.removeCpuGroupsOfFour(this.state.cpu);
     console.log("ending cpuTurn function execution");
   }
 
@@ -200,8 +203,6 @@ class Game extends React.Component{
   }
 
   myTurn(request) {
-
-    this.removeGroupsOfFour(this.state.hand);
 
     console.log("myTurn invoked");
 
@@ -259,6 +260,8 @@ class Game extends React.Component{
             hand: hand,
             cpu: cpu }
         ); }.bind(this), 1000);
+
+        this.removeMyGroupsOfFour(this.state.hand);
 
   }
 
@@ -361,62 +364,141 @@ class Game extends React.Component{
     return array;
   }
 
-  removeGroupsOfFour (array) {
+  removeMyGroupsOfFour (hand) {
+
+    var myGroups = this.state.myGroups;
 
     for (var i = 2; i < 11; i++) {
 
-        if (this.countInArray(array, i) === 4) {
-            array = this.moveToFront(array.indexOf("c" +i), array);
-            array = this.moveToFront(array.indexOf("s" +i), array);
-            array = this.moveToFront(array.indexOf("d" +i), array);
-            array = this.moveToFront(array.indexOf("h" +i), array);
+        if (this.countInArray(hand, i) === 4) {
+            hand = this.moveToFront(hand.indexOf("c" +i), hand);
+            hand = this.moveToFront(hand.indexOf("s" +i), hand);
+            hand = this.moveToFront(hand.indexOf("d" +i), hand);
+            hand = this.moveToFront(hand.indexOf("h" +i), hand);
 
-            array.splice(0,4); //removes the group of four identical cards from front of array
+            myGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+            hand.splice(0,4); //removes the group of four identical cards from front of array
 
         }
     }
 
-    if (this.countInArray(array, "j") === 4) {
+    if (this.countInArray(hand, "j") === 4) {
 
-        array = this.moveToFront(array.indexOf("cj"), array);
-        array = this.moveToFront(array.indexOf("sj"), array);
-        array = this.moveToFront(array.indexOf("dj"), array);
-        array = this.moveToFront(array.indexOf("hj"), array);
+        hand = this.moveToFront(hand.indexOf("cj"), hand);
+        hand = this.moveToFront(hand.indexOf("sj"), hand);
+        hand = this.moveToFront(hand.indexOf("dj"), hand);
+        hand = this.moveToFront(hand.indexOf("hj"), hand);
 
-        array.splice(0,4);
+        myGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
     }
 
-    if (this.countInArray(array, "q") === 4) {
+    if (this.countInArray(hand, "q") === 4) {
 
-        array = this.moveToFront(array.indexOf("cq"), array);
-        array = this.moveToFront(array.indexOf("sq"), array);
-        array = this.moveToFront(array.indexOf("dq"), array);
-        array = this.moveToFront(array.indexOf("hq"), array);
+        hand = this.moveToFront(hand.indexOf("cq"), hand);
+        hand = this.moveToFront(hand.indexOf("sq"), hand);
+        hand = this.moveToFront(hand.indexOf("dq"), hand);
+        hand = this.moveToFront(hand.indexOf("hq"), hand);
 
-        array.splice(0,4);
+        myGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
     }
 
-    if (this.countInArray(array, "k") === 4 ) {
+    if (this.countInArray(hand, "k") === 4 ) {
 
-        array = this.moveToFront(array.indexOf("ck"), array);
-        array = this.moveToFront(array.indexOf("sk"), array);
-        array = this.moveToFront(array.indexOf("dk"), array);
-        array = this.moveToFront(array.indexOf("hk"), array);
+        hand = this.moveToFront(hand.indexOf("ck"), hand);
+        hand = this.moveToFront(hand.indexOf("sk"), hand);
+        hand = this.moveToFront(hand.indexOf("dk"), hand);
+        hand = this.moveToFront(hand.indexOf("hk"), hand);
 
-        array.splice(0,4);
+        myGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
     }
 
-    if (this.countInArray(array, "a") === 4) {
+    if (this.countInArray(hand, "a") === 4) {
 
-        array = this.moveToFront(array.indexOf("ca"), array);
-        array = this.moveToFront(array.indexOf("sa"), array);
-        array = this.moveToFront(array.indexOf("da"), array);
-        array = this.moveToFront(array.indexOf("ha"), array);
+        hand = this.moveToFront(hand.indexOf("ca"), hand);
+        hand = this.moveToFront(hand.indexOf("sa"), hand);
+        hand = this.moveToFront(hand.indexOf("da"), hand);
+        hand = this.moveToFront(hand.indexOf("ha"), hand);
 
-        array.splice(0,4);
+        myGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
     }
 
-    return array;
+    this.setState({
+      hand: hand,
+      myGroups: myGroups
+    });
+
+  }
+
+  removeCpuGroupsOfFour (hand) {
+
+    var cpuGroups = this.state.CpuGroups;
+
+    for (var i = 2; i < 11; i++) {
+
+        if (this.countInArray(hand, i) === 4) {
+            hand = this.moveToFront(hand.indexOf("c" +i), hand);
+            hand = this.moveToFront(hand.indexOf("s" +i), hand);
+            hand = this.moveToFront(hand.indexOf("d" +i), hand);
+            hand = this.moveToFront(hand.indexOf("h" +i), hand);
+
+            cpuGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+            hand.splice(0,4); //removes the group of four identical cards from front of array
+
+        }
+    }
+
+    if (this.countInArray(hand, "j") === 4) {
+
+        hand = this.moveToFront(hand.indexOf("cj"), hand);
+        hand = this.moveToFront(hand.indexOf("sj"), hand);
+        hand = this.moveToFront(hand.indexOf("dj"), hand);
+        hand = this.moveToFront(hand.indexOf("hj"), hand);
+
+        cpuGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
+    }
+
+    if (this.countInArray(hand, "q") === 4) {
+
+        hand = this.moveToFront(hand.indexOf("cq"), hand);
+        hand = this.moveToFront(hand.indexOf("sq"), hand);
+        hand = this.moveToFront(hand.indexOf("dq"), hand);
+        hand = this.moveToFront(hand.indexOf("hq"), hand);
+
+        cpuGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
+    }
+
+    if (this.countInArray(hand, "k") === 4 ) {
+
+        hand = this.moveToFront(hand.indexOf("ck"), hand);
+        hand = this.moveToFront(hand.indexOf("sk"), hand);
+        hand = this.moveToFront(hand.indexOf("dk"), hand);
+        hand = this.moveToFront(hand.indexOf("hk"), hand);
+
+        cpuGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
+    }
+
+    if (this.countInArray(hand, "a") === 4) {
+
+        hand = this.moveToFront(hand.indexOf("ca"), hand);
+        hand = this.moveToFront(hand.indexOf("sa"), hand);
+        hand = this.moveToFront(hand.indexOf("da"), hand);
+        hand = this.moveToFront(hand.indexOf("ha"), hand);
+
+        cpuGroups.unshift(hand[0], hand[1], hand[2],hand[3]);
+        hand.splice(0,4);
+    }
+
+    this.setState({
+      cpu: hand,
+      cpuGroups: cpuGroups
+    });
 
   }
 
@@ -546,7 +628,7 @@ class Game extends React.Component{
         setTimeout(function() {this.cpuTurn(); }.bind(this), 1000);
       }
       else {
-        setTimeout(function () {this.setState({cpuRequest: "Your turn", cpuChosenAskingCard: "", request: "", disabledCards: []}, () => { console.log("setState called");}); }.bind(this), 1000);
+        setTimeout(function() {this.setState({cpuRequest: "Your turn", cpuChosenAskingCard: "", request: "", disabledCards: []}, () => { console.log("setState called");}); }.bind(this), 1000);
       }
   }
 
@@ -598,7 +680,8 @@ class Game extends React.Component{
             <HandFrame disabledCards={this.state.disabledCards} hand= {this.state.hand} sendCardToCpu={this.sendCardToCpu.bind(this)}/>
             <MyBubbleFrame request = {this.state.request}/>
             <div>
-              <RequestFrame onUpdate={this.onUpdate} request={this.state.request}/>
+              <RequestFrame onUpdate={this.onUpdate} request={this.state.request}
+                            cpuRequest={this.state.cpuRequest}/>
               <ButtonFrame
               cards= {this.state.cards}
               shuffle= {this.shuffle}

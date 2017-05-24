@@ -1,0 +1,28 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+class MyGroupFrame extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  var cards=this.props
+  for (var i = 0; i <cpu.length; i ++) {
+    cards.push(
+      <span key={i} className = "card" id = "facedown"> </span>
+    )
+  }
+
+  render () {
+
+    return (
+    <div>
+      <input type='text' ref='simpleForm'/>
+      <input type='button' onClick={this.update} disabled={this.props.cpuRequest !== "Your turn"} value='Ask'/>
+    </div>
+
+    );
+  }
+}
+
+export default RequestFrame;

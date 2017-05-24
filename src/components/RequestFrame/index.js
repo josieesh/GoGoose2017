@@ -23,7 +23,7 @@ class RequestFrame extends React.Component {
     return (
     <div>
       <input type='text' ref='simpleForm'/>
-      <input type='button' onClick={this.update} disabled={this.props.request !== ""} value='Ask'/>
+      <input type='button' onClick={this.update} disabled={this.props.cpuRequest !== "Your turn" && this.props.cpuRequest !== "Yep!"} value='Ask'/>
     </div>
 
     );
